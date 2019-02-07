@@ -27,6 +27,8 @@ $app->withFacades();
 
 $app->withEloquent();
 
+$app->configure('errors');
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings

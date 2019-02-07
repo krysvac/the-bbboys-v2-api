@@ -42,17 +42,29 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Exception $exception
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
     {
-        if($exception instanceof NotFoundHttpException){
-            return response(view("errors.404"), 404);
+        if ($exception instanceof NotFoundHttpException) {
+            return response()->json([
+                'status' => 404,
+                'message' => config()['errors'][404]
+            ], 404);
         }
-        if($exception instanceof BadRequestHttpException){
-            return response(view("errors.400"), 400);
+        if ($exception instanceof BadRequestHttpException) {
+            return response()->json([
+                'status' => 400,
+                'message' => config()['errors'][400]
+            ], 400);
+        }
+        if ($exception instanceof ModelNotFoundException) {
+            return response()->json([
+                'status' => 400,
+                'message' => config()['errors'][400]
+            ], 400);
         }
         return parent::render($request, $exception);
     }

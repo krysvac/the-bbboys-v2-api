@@ -12,7 +12,7 @@
 */
 
 $router->get('/', function () use ($router) {
-    return response(view("errors.400"), 400);
+    throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
 });
 
 $router->post('login', ['uses' => 'ApiController@login']);
@@ -20,13 +20,17 @@ $router->post('login', ['uses' => 'ApiController@login']);
 $router->get('logout', ['uses' => 'ApiController@logout']);
 
 $router->group(['prefix' => 'api'], function () use ($router) {
+    $router->get('/', function () use ($router) {
+        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
+    });
+
     $router->post('vote', ['uses' => 'ApiController@vote']);
 
     $router->post('changepassword', ['uses' => 'ApiController@changePassword']);
 
     $router->post('createLink', ['uses' => 'ApiController@createLink']);
 
-    $router->get('votes/{poll_id}', ['uses' => 'ApiController@getVotes']);
+    $router->get('votes/{poll_id}', ['uses' => 'ApiController@getPollAnswers']);
 
     $router->group(['prefix' => 'food'], function () use ($router) {
         $router->get('bistroj', ['uses' => 'ApiController@getBistrojItems']);
