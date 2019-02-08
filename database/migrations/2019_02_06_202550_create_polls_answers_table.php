@@ -23,7 +23,7 @@ class CreatePollsAnswersTable extends Migration
             $table->unsignedInteger("poll_id");
             $table->unsignedInteger("choice_id");
             $table->string("ip_address", 100);
-            $table->timestamp("timestamp")->useCurrent();
+            $table->dateTime("timestamp")->useCurrent();
         });
 
         Schema::table('polls_answers', function (Blueprint $table) {

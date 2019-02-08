@@ -21,7 +21,7 @@ class CreateRegistrationLinksTable extends Migration
             $table->increments('id');
             $table->string("token", 128);
             $table->tinyInteger("used")->default(0);
-            $table->timestamp("timestamp")->useCurrent();
+            $table->dateTime("timestamp")->useCurrent();
 
             $table->unique('token', 'registration_link');
         });
