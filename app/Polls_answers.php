@@ -13,8 +13,10 @@ class Polls_answers extends Model
      * @var array
      */
     protected $fillable = [
+        'user_id',
         'poll_id',
-        'choice_id'
+        'choice_id',
+        'ip_address'
     ];
 
     /**
@@ -41,5 +43,4 @@ class Polls_answers extends Model
             ["timestamp", "<=", $end]
         ]);
     }
-
 }

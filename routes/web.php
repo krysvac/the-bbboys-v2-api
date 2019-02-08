@@ -32,6 +32,12 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     $router->get('votes/{poll_id}', ['uses' => 'ApiController@getPollAnswers']);
 
+    $router->get('poll/{poll_id}', ['uses' => 'ApiController@getPoll']);
+
+    $router->get('poll/{poll_id}/choices', ['uses' => 'ApiController@getPollChoices']);
+
+    $router->get('registrationLinks', ['uses' => 'ApiController@getRegistrationLinks']);
+
     $router->group(['prefix' => 'food'], function () use ($router) {
         $router->get('bistroj', ['uses' => 'ApiController@getBistrojItems']);
         $router->get('villa', ['uses' => 'ApiController@getVillaItems']);

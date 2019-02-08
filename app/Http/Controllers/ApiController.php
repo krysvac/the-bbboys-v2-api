@@ -2,14 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Polls;
+use App\Polls_choices;
 use App\Polls_answers;
-use Illuminate\Support\Facades\DB;
+use App\Registration_links;
 
 class ApiController extends Controller
 {
+    public function getPoll($poll_id)
+    {
+        return response()->json(Polls::findOrFail($poll_id)->get());
+    }
+
+    public function getPollChoices($poll_id)
+    {
+        return response()->json(Polls_choices::byPollId($poll_id)->get());
+    }
+
     public function getPollAnswers($poll_id)
     {
         return response()->json(Polls_answers::byPollId($poll_id)->get());
+    }
+
+    public function getRegistrationLinks()
+    {
+        return response()->json(Registration_links::orderBy("timestamp", "desc")->get());
     }
 
     public function getBistrojItems()
