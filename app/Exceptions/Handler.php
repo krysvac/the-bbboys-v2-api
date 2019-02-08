@@ -10,6 +10,7 @@ use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -65,6 +66,12 @@ class Handler extends ExceptionHandler
                 'status' => 400,
                 'message' => config()['errors'][400]
             ], 400);
+        }
+        if ($exception instanceof UnauthorizedHttpException) {
+            return response()->json([
+                'status' => 401,
+                'message' => config()['errors'][401]
+            ], 401);
         }
         return parent::render($request, $exception);
     }
