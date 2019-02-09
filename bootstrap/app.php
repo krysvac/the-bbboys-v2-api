@@ -77,6 +77,10 @@ $app->routeMiddleware([
     'jwt.authAdmin' => App\Http\Middleware\JwtMiddlewareAdmin::class,
 ]);
 
+$app->middleware([
+    App\Http\Middleware\CorsMiddleware::class
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
