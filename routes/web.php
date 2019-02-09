@@ -15,31 +15,36 @@ $router->get('/', function () use ($router) {
     throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
 });
 
-$router->post('login', ['uses' => 'ApiController@login']);
+$router->post('login', ['uses' => 'AuthController@authenticate']);
 
-$router->get('logout', ['uses' => 'ApiController@logout']);
+$router->get('validateAuth', ['middleware' => 'jwt.authUser',
+    'uses' => 'AuthController@validateToken']);
 
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/', function () use ($router) {
         throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
     });
 
-    $router->post('vote', ['uses' => 'ApiController@vote']);
-
-    $router->post('changepassword', ['uses' => 'ApiController@changePassword']);
-
-    $router->post('createLink', ['uses' => 'ApiController@createLink']);
-
-    $router->get('votes/{poll_id}', ['uses' => 'ApiController@getPollAnswers']);
-
     $router->get('poll/{poll_id}', ['uses' => 'ApiController@getPoll']);
 
     $router->get('poll/{poll_id}/choices', ['uses' => 'ApiController@getPollChoices']);
 
-    $router->get('registrationLinks', ['uses' => 'ApiController@getRegistrationLinks']);
+    $router->get('votes/{poll_id}', ['uses' => 'ApiController@getPollAnswers']);
 
     $router->group(['prefix' => 'food'], function () use ($router) {
         $router->get('bistroj', ['uses' => 'ApiController@getBistrojItems']);
         $router->get('villa', ['uses' => 'ApiController@getVillaItems']);
     });
+});
+
+$router->group(['prefix' => 'api', 'middleware' => 'jwt.authUser'], function () use ($router) {
+    $router->post('vote', ['uses' => 'ApiController@vote']);
+
+    $router->post('changepassword', ['uses' => 'ApiController@changePassword']);
+});
+
+$router->group(['prefix' => 'api', 'middleware' => 'jwt.authAdmin'], function () use ($router) {
+    $router->post('createLink', ['uses' => 'ApiController@createLink']);
+
+    $router->get('registrationLinks', ['uses' => 'ApiController@getRegistrationLinks']);
 });

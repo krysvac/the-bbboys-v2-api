@@ -61,18 +61,18 @@ class Handler extends ExceptionHandler
                 'message' => config()['errors'][400]
             ], 400);
         }
-        if ($exception instanceof ModelNotFoundException) {
-            return response()->json([
-                'status' => 400,
-                'message' => config()['errors'][400]
-            ], 400);
-        }
         if ($exception instanceof UnauthorizedHttpException) {
             return response()->json([
                 'status' => 401,
                 'message' => config()['errors'][401]
             ], 401);
         }
-        return parent::render($request, $exception);
+
+        //return parent::render($request, $exception);
+
+        return response()->json([
+            'status' => 400,
+            'message' => config()['errors'][400]
+        ], 400);
     }
 }

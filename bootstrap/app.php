@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 try {
     (new Dotenv\Dotenv(dirname(__DIR__)))->load();
@@ -69,6 +69,14 @@ $app->singleton(
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
 
+$app->routeMiddleware([
+    'jwt.authUser' => App\Http\Middleware\JwtMiddlewareUser::class,
+]);
+
+$app->routeMiddleware([
+    'jwt.authAdmin' => App\Http\Middleware\JwtMiddlewareAdmin::class,
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
@@ -98,7 +106,7 @@ $app->singleton(
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__ . '/../routes/web.php';
 });
 
 return $app;
