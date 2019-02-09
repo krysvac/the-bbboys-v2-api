@@ -11,12 +11,11 @@ class ApiController extends Controller
 {
     public function getPoll($poll_id)
     {
-        return response()->json(Polls::findOrFail($poll_id)->get());
-    }
-
-    public function getPollChoices($poll_id)
-    {
-        return response()->json(Polls_choices::byPollId($poll_id)->get());
+        return response()->json(
+            [
+                'poll' => Polls::findOrFail($poll_id)->first(),
+                'choices' => Polls_choices::byPollId($poll_id)->get()
+            ]);
     }
 
     public function getPollAnswers($poll_id)

@@ -15,19 +15,14 @@ $router->get('/', function () use ($router) {
     throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
 });
 
-$router->post('login', ['uses' => 'AuthController@authenticate']);
-
-$router->get('validateAuth', ['middleware' => 'jwt.authUser',
-    'uses' => 'AuthController@validateToken']);
-
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/', function () use ($router) {
         throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
     });
 
-    $router->get('poll/{poll_id}', ['uses' => 'ApiController@getPoll']);
+    $router->post('login', ['uses' => 'AuthController@authenticate']);
 
-    $router->get('poll/{poll_id}/choices', ['uses' => 'ApiController@getPollChoices']);
+    $router->get('poll/{poll_id}', ['uses' => 'ApiController@getPoll']);
 
     $router->get('votes/{poll_id}', ['uses' => 'ApiController@getPollAnswers']);
 
@@ -38,6 +33,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 });
 
 $router->group(['prefix' => 'api', 'middleware' => 'jwt.authUser'], function () use ($router) {
+    $router->get('validateAuth', ['uses' => 'AuthController@validateToken']);
+
     $router->post('vote', ['uses' => 'ApiController@vote']);
 
     $router->post('changepassword', ['uses' => 'ApiController@changePassword']);
