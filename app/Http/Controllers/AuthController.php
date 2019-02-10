@@ -75,9 +75,11 @@ class AuthController extends Controller
 
         throw new BadRequestHttpException;
     }
-    
+
     public function validateToken()
     {
-        return response()->json([], 200);
+        return response()->json([
+            'token' => $this->jwt($this->request->auth)
+        ], 200);
     }
 }

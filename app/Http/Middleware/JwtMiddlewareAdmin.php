@@ -25,14 +25,14 @@ class JwtMiddlewareAdmin
             $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
         } catch (ExpiredException $e) {
             return response()->json([
-                'status' => 400,
+                'status' => 401,
                 'message' => "The provided authentication token has expired!"
-            ], 400);
+            ], 401);
         } catch (Exception $e) {
             return response()->json([
-                'status' => 400,
-                'message' => config()['errors'][400]
-            ], 400);
+                'status' => 401,
+                'message' => config()['errors'][401]
+            ], 401);
         }
         $user = User::findOrFail($credentials->sub);
         $request->auth = $user;
