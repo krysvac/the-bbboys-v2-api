@@ -226,4 +226,11 @@ class ApiController extends Controller
 
         return response()->json(['votingAllowed' => $cutoff >= $now]);
     }
+
+    public function getChoiceVotedFor()
+    {
+        $user_id = $this->request->auth["id"];
+
+        return response()->json(Polls_answers::byUserId($user_id)->first());
+    }
 }

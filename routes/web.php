@@ -39,9 +39,11 @@ $router->group(['prefix' => 'api', 'middleware' => 'jwt.authUser'], function () 
 
     $router->post('changepassword', ['uses' => 'ApiController@changePassword']);
 
-    $router->post('userCanVote', ['uses' => 'ApiController@getUserCanVoteToday']);
+    $router->get('userCanVote', ['uses' => 'ApiController@getUserCanVoteToday']);
 
-    $router->post('votingIsAllowed', ['uses' => 'ApiController@getVotingIsAllowed']);
+    $router->get('votingIsAllowed', ['uses' => 'ApiController@getVotingIsAllowed']);
+
+    $router->get('selectedChoice', ['uses' => 'ApiController@getChoiceVotedFor']);
 });
 
 $router->group(['prefix' => 'api', 'middleware' => 'jwt.authAdmin'], function () use ($router) {
