@@ -31,25 +31,25 @@ class ApiController extends Controller
     public function getBistrojItems()
     {
         $days = array(
-            "monday" => '<th class="amatic-700 whoa text-danger">M',
-            "tuesday" => '<th class="amatic-700 whoa text-danger">Tis',
-            "wednesday" => '<th class="amatic-700 whoa text-danger">Ons',
-            "thursday" => '<th class="amatic-700 whoa text-danger">Tors',
-            "friday" => '<th class="amatic-700 whoa text-danger">Fre');
+            "1" => '<th class="amatic-700 whoa text-danger">M',
+            "2" => '<th class="amatic-700 whoa text-danger">Tis',
+            "3" => '<th class="amatic-700 whoa text-danger">Ons',
+            "4" => '<th class="amatic-700 whoa text-danger">Tors',
+            "5" => '<th class="amatic-700 whoa text-danger">Fre');
 
         $mealStart = array(
-            "monday" => '<td width="33%">',
-            "tuesday" => '<td width="33%">',
-            "wednesday" => '<td width="33%">',
-            "thursday" => '<td width="33%">',
-            "friday" => '<td width="33%">');
+            "1" => '<td width="33%">',
+            "2" => '<td width="33%">',
+            "3" => '<td width="33%">',
+            "4" => '<td width="33%">',
+            "5" => '<td width="33%">');
 
         $daysEndings = array(
-            "monday" => "</th>",
-            "tuesday" => "</th>",
-            "wednesday" => "</th>",
-            "thursday" => "</th>",
-            "friday" => "</th>");
+            "1" => "</th>",
+            "2" => "</th>",
+            "3" => "</th>",
+            "4" => "</th>",
+            "5" => "</th>");
 
         $website_url = "http://www.hors.se/veckans-meny/?rest=183";
         $curl = curl_init();
@@ -112,25 +112,25 @@ class ApiController extends Controller
     public function getVillaItems()
     {
         $days = array(
-            "monday" => '<th class="amatic-700 whoa text-danger">M',
-            "tuesday" => '<th class="amatic-700 whoa text-danger">Tis',
-            "wednesday" => '<th class="amatic-700 whoa text-danger">Ons',
-            "thursday" => '<th class="amatic-700 whoa text-danger">Tors',
-            "friday" => '<th class="amatic-700 whoa text-danger">Fre');
+            "1" => '<th class="amatic-700 whoa text-danger">M',
+            "2" => '<th class="amatic-700 whoa text-danger">Tis',
+            "3" => '<th class="amatic-700 whoa text-danger">Ons',
+            "4" => '<th class="amatic-700 whoa text-danger">Tors',
+            "5" => '<th class="amatic-700 whoa text-danger">Fre');
 
         $mealStart = array(
-            "monday" => '<td width="33%">',
-            "tuesday" => '<td width="33%">',
-            "wednesday" => '<td width="33%">',
-            "thursday" => '<td width="33%">',
-            "friday" => '<td width="33%">');
+            "1" => '<td width="33%">',
+            "2" => '<td width="33%">',
+            "3" => '<td width="33%">',
+            "4" => '<td width="33%">',
+            "5" => '<td width="33%">');
 
         $daysEndings = array(
-            "monday" => "</th>",
-            "tuesday" => "</th>",
-            "wednesday" => "</th>",
-            "thursday" => "</th>",
-            "friday" => "</th>");
+            "1" => "</th>",
+            "2" => "</th>",
+            "3" => "</th>",
+            "4" => "</th>",
+            "5" => "</th>");
 
         $website_url = "http://www.hors.se/veckans-meny/?rest=2881";
         $curl = curl_init();
