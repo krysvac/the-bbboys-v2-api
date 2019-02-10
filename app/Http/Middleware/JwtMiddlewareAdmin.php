@@ -35,6 +35,7 @@ class JwtMiddlewareAdmin
             ], 400);
         }
         $user = User::findOrFail($credentials->sub);
+        $request->auth = $user;
 
         if ((string)$user["isAdmin"] === "1") {
             // Now let's put the user in the request class so that you can grab it from there

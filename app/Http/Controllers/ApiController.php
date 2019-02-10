@@ -6,9 +6,29 @@ use App\Polls;
 use App\Polls_choices;
 use App\Polls_answers;
 use App\Registration_links;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
+    /**
+     * The request instance.
+     *
+     * @var \Illuminate\Http\Request
+     */
+    private $request;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return void
+     */
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
+
     public function getPoll($poll_id)
     {
         return response()->json(
@@ -188,5 +208,22 @@ class ApiController extends Controller
         }
 
         return response()->json($items);
+    }
+
+    public function getUserCanVoteToday()
+    {
+        $user_id = $this->request->auth["id"];
+
+        $votes = Polls_answers::byUserId($user_id)->get();
+
+        return response()->json(['canVote' => count($votes) === 0]);
+    }
+
+    public function getVotingIsAllowed()
+    {
+        $cutoff = Carbon::createFromTimestamp(strtotime('today midnight + 11 hours 30 minutes'))->toDateTimeString();
+        $now = Carbon::now();
+
+        return response()->json(['votingAllowed' => $cutoff >= $now]);
     }
 }

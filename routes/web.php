@@ -38,6 +38,10 @@ $router->group(['prefix' => 'api', 'middleware' => 'jwt.authUser'], function () 
     $router->post('vote', ['uses' => 'ApiController@vote']);
 
     $router->post('changepassword', ['uses' => 'ApiController@changePassword']);
+
+    $router->post('userCanVote', ['uses' => 'ApiController@getUserCanVoteToday']);
+
+    $router->post('votingIsAllowed', ['uses' => 'ApiController@getVotingIsAllowed']);
 });
 
 $router->group(['prefix' => 'api', 'middleware' => 'jwt.authAdmin'], function () use ($router) {

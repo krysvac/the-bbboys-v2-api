@@ -43,4 +43,18 @@ class Polls_answers extends Model
             ["timestamp", "<=", $end]
         ]);
     }
+
+    public function scopeByUserId($query, $user_id)
+    {
+        User::findOrFail($user_id);
+
+        $start = Carbon::createFromTimestamp(strtotime('today midnight'))->toDateTimeString();
+        $end = Carbon::createFromTimestamp(strtotime('today midnight +23 hours 59 minutes 59 seconds'))->toDateTimeString();
+
+        return $query->where([
+            ["user_id", "=", $user_id],
+            ["timestamp", ">=", $start],
+            ["timestamp", "<=", $end]
+        ]);
+    }
 }
