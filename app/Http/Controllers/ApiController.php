@@ -8,6 +8,7 @@ use App\Polls_answers;
 use App\Registration_links;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ApiController extends Controller
 {
@@ -221,7 +222,7 @@ class ApiController extends Controller
 
     public function getVotingIsAllowed()
     {
-        $cutoff = Carbon::createFromTimestamp(strtotime('today midnight + 11 hours 30 minutes'))->toDateTimeString();
+        $cutoff = Carbon::createFromTimestamp(strtotime('today midnight + 23 hours 30 minutes'))->toDateTimeString();
         $now = Carbon::now();
 
         return response()->json(['votingAllowed' => $cutoff >= $now]);
@@ -232,5 +233,45 @@ class ApiController extends Controller
         $user_id = $this->request->auth["id"];
 
         return response()->json(Polls_answers::byUserId($user_id)->first());
+    }
+
+    public function vote()
+    {
+        if ($this->request->has('poll_id') && $this->request->has('choice_id')) {
+            $poll_id = $this->request->input('poll_id');
+            $choice_id = $this->request->input('choice_id');
+
+            Polls::findOrFail($poll_id);
+            Polls_choices::findOrFail($choice_id);
+
+            $user_id = $this->request->auth["id"];
+
+            $votes = Polls_answers::byUserId($user_id)->get();
+
+            if (count($votes) === 0) {
+                $answer = new Polls_answers();
+
+                $answer->user_id = (int)$user_id;
+                $answer->poll_id = (int)$poll_id;
+                $answer->choice_id = (int)$choice_id;
+                $answer->ip_address = $this->request->ip();
+
+                $answer->timestamps = false;
+
+                $answer->save();
+
+                return response()->json([
+                    'status' => 201,
+                    'message' => 'Vote saved'
+                ], 201);
+            } else {
+                return response()->json([
+                    'status' => '401_ALREADY_VOTED',
+                    'message' => config()['errors']['401_ALREADY_VOTED']
+                ], 401);
+            }
+        } else {
+            throw new BadRequestHttpException;
+        }
     }
 }
