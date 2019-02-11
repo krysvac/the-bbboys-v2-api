@@ -63,17 +63,24 @@ class AuthController extends Controller
         // Find the user by email
         $user = User::where('username', $this->request->input('username'))->first();
         if (!$user) {
-            throw new BadRequestHttpException;
+            return response()->json([
+                'status' => '401_LOGIN',
+                'message' => config()['errors']['401_LOGIN']
+            ], 401);
         }
 
         // Verify the password and generate the token
         if (Hash::check($this->request->input('password'), $user->password)) {
             return response()->json([
+                'admin' => $user["isAdmin"],
                 'token' => $this->jwt($user)
             ], 200);
         }
 
-        throw new BadRequestHttpException;
+        return response()->json([
+            'status' => '401_LOGIN',
+            'message' => config()['errors']['401_LOGIN']
+        ], 401);
     }
 
     public function validateToken()
