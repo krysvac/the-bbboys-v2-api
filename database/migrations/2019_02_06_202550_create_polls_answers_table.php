@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -23,7 +24,7 @@ class CreatePollsAnswersTable extends Migration
             $table->unsignedInteger("poll_id");
             $table->unsignedInteger("choice_id");
             $table->string("ip_address", 100);
-            $table->dateTime("timestamp")->useCurrent();
+            $table->dateTime("timestamp")->default(DB::raw('CURRENT_TIMESTAMP'));
         });
 
         Schema::table('polls_answers', function (Blueprint $table) {
