@@ -15,24 +15,18 @@ $router->get('/', function () use ($router) {
     throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
 });
 
-$router->group(['prefix' => 'api'], function () use ($router) {
-    $router->get('/', function () use ($router) {
-        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
-    });
+$router->post('login', ['uses' => 'AuthController@authenticate']);
 
-    $router->post('login', ['uses' => 'AuthController@authenticate']);
+$router->get('poll/{poll_id}', ['uses' => 'ApiController@getPoll']);
 
-    $router->get('poll/{poll_id}', ['uses' => 'ApiController@getPoll']);
+$router->get('votes/{poll_id}', ['uses' => 'ApiController@getPollAnswers']);
 
-    $router->get('votes/{poll_id}', ['uses' => 'ApiController@getPollAnswers']);
-
-    $router->group(['prefix' => 'food'], function () use ($router) {
-        $router->get('bistroj', ['uses' => 'ApiController@getBistrojItems']);
-        $router->get('villa', ['uses' => 'ApiController@getVillaItems']);
-    });
+$router->group(['prefix' => 'food'], function () use ($router) {
+    $router->get('bistroj', ['uses' => 'ApiController@getBistrojItems']);
+    $router->get('villa', ['uses' => 'ApiController@getVillaItems']);
 });
 
-$router->group(['prefix' => 'api', 'middleware' => 'jwt.authUser'], function () use ($router) {
+$router->group(['middleware' => 'jwt.authUser'], function () use ($router) {
     $router->get('validateAuth', ['uses' => 'AuthController@validateToken']);
 
     $router->post('vote', ['uses' => 'ApiController@vote']);
@@ -46,7 +40,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'jwt.authUser'], function () 
     $router->get('selectedChoice', ['uses' => 'ApiController@getChoiceVotedFor']);
 });
 
-$router->group(['prefix' => 'api', 'middleware' => 'jwt.authAdmin'], function () use ($router) {
+$router->group(['middleware' => 'jwt.authAdmin'], function () use ($router) {
     $router->post('createLink', ['uses' => 'ApiController@createLink']);
 
     $router->get('registrationLinks', ['uses' => 'ApiController@getRegistrationLinks']);
