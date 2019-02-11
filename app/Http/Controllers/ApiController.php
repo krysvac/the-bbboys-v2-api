@@ -237,6 +237,7 @@ class ApiController extends Controller
 
     public function vote()
     {
+        date_default_timezone_set("Europe/Stockholm");
         if ($this->request->has('poll_id') && $this->request->has('choice_id')) {
             $poll_id = $this->request->input('poll_id');
             $choice_id = $this->request->input('choice_id');
@@ -255,6 +256,7 @@ class ApiController extends Controller
                 $answer->poll_id = (int)$poll_id;
                 $answer->choice_id = (int)$choice_id;
                 $answer->ip_address = $this->request->ip();
+                $answer->timestamp = date('Y-m-d H:i:s');
 
                 $answer->timestamps = false;
 
