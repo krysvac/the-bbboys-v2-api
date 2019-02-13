@@ -21,5 +21,7 @@ class Registration_links extends Model
      *
      * @var array
      */
-    protected $hidden = [];
+    protected $hidden = [
+        'id'
+    ];
 }
