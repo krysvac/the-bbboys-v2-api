@@ -12,8 +12,8 @@ class Registration_links extends Model
      * @var array
      */
     protected $fillable = [
-        'poll_id',
-        'value'
+        'token',
+        'timestamp'
     ];
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -21,7 +22,7 @@ class CreateRegistrationLinksTable extends Migration
             $table->increments('id');
             $table->string("token", 128);
             $table->tinyInteger("used")->default(0);
-            $table->dateTime("timestamp")->useCurrent();
+            $table->dateTime("timestamp")->default(DB::raw('CURRENT_TIMESTAMP'));
 
             $table->unique('token', 'registration_link');
         });
