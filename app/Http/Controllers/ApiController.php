@@ -6,8 +6,10 @@ use App\Polls;
 use App\Polls_choices;
 use App\Polls_answers;
 use App\Registration_links;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ApiController extends Controller
@@ -304,6 +306,40 @@ class ApiController extends Controller
         }
         if (function_exists('openssl_random_pseudo_bytes')) {
             return bin2hex(openssl_random_pseudo_bytes($length));
+        }
+    }
+
+    public function changePassword()
+    {
+        if ($this->request->has('oldPassword') && $this->request->has('newPassword')) {
+            $this->validate($this->request, [
+                'oldPassword' => 'bail|required|max:50',
+                'newPassword' => 'bail|required|min:10|max:50|regex:/^[a-zA-ZåÅäÄöÖ\_0-9!@#.]+$/'
+            ]);
+
+            $oldPw = $this->request->input('oldPassword');
+            $newPw = $this->request->input('newPassword');
+            $user_id = $this->request->auth["id"];
+
+            $user = User::where('id', $user_id)->first();
+            if (!Hash::check($oldPw, $user->password)) {
+                return response()->json([
+                    'status' => '401_CURRENT_PASSWORD',
+                    'message' => config()['errors'][401]
+                ], 401);
+            }
+
+            $user->password = password_hash($newPw, PASSWORD_BCRYPT);
+            $user->timestamps = false;
+
+            $user->save();
+
+            return response()->json([
+                'status' => 204,
+                'message' => 'Password changed'
+            ], 204);
+        } else {
+            throw new BadRequestHttpException;
         }
     }
 }
