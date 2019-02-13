@@ -31,7 +31,7 @@ $router->group(['middleware' => 'jwt.authUser'], function () use ($router) {
 
     $router->post('vote', ['uses' => 'ApiController@vote']);
 
-    $router->post('changepassword', ['uses' => 'ApiController@changePassword']);
+    $router->post('changePassword', ['uses' => 'ApiController@changePassword']);
 
     $router->get('userCanVote', ['uses' => 'ApiController@getUserCanVoteToday']);
 
