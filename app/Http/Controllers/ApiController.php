@@ -224,7 +224,7 @@ class ApiController extends Controller
 
     public function getVotingIsAllowed()
     {
-        $cutoff = Carbon::createFromTimestamp(strtotime('today midnight + 23 hours 30 minutes'))->toDateTimeString();
+        $cutoff = Carbon::createFromTimestamp(strtotime('today midnight + 11 hours 30 minutes'))->toDateTimeString();
         $now = Carbon::now();
 
         return response()->json(['votingAllowed' => $cutoff >= $now]);
