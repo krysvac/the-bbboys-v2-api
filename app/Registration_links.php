@@ -24,4 +24,12 @@ class Registration_links extends Model
     protected $hidden = [
         'id'
     ];
+
+    public function scopeByToken($query, $token)
+    {
+        return $query->where([
+            ["token", "=", $token],
+            ["used", "=", 0],
+        ]);
+    }
 }

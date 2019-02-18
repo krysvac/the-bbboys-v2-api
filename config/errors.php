@@ -5,5 +5,6 @@ return [
     '401_LOGIN' => 'Incorrect username or password',
     '401_EXPIRED' => 'The provided authentication token has expired!',
     '401_ALREADY_VOTED' => 'Already voted today',
+    '403' => 'Forbidden',
     '404' => 'The requested resource could not be found! Please try again.',
 ];

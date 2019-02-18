@@ -21,6 +21,10 @@ $router->get('poll/{poll_id}', ['uses' => 'ApiController@getPoll']);
 
 $router->get('votes/{poll_id}', ['uses' => 'ApiController@getPollAnswers']);
 
+$router->post('validateToken', ['uses' => 'ApiController@validateToken']);
+
+$router->post('register', ['uses' => 'ApiController@register']);
+
 $router->group(['prefix' => 'food'], function () use ($router) {
     $router->get('bistroj', ['uses' => 'ApiController@getBistrojItems']);
     $router->get('villa', ['uses' => 'ApiController@getVillaItems']);

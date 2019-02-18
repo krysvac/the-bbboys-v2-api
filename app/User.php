@@ -24,4 +24,9 @@ class User extends Model
     protected $hidden = [
         'password'
     ];
+
+    public function scopeByUsername($query, $username)
+    {
+        return $query->where("username", "=", $username);
+    }
 }

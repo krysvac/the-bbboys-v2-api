@@ -342,4 +342,109 @@ class ApiController extends Controller
             throw new BadRequestHttpException;
         }
     }
+
+    public function validateToken()
+    {
+        if ($this->request->has('token')) {
+            $this->validate($this->request, [
+                'token' => 'bail|required|alpha_num|max:128'
+            ]);
+
+            $token = $this->request->input('token');
+
+            if ($this->registerTokenIsValid($token)) {
+                return response()->json([
+                    'status' => 204,
+                    'message' => 'Token valid'
+                ], 204);
+            } else {
+                return response()->json([
+                    'status' => 403,
+                    'message' => config()['errors'][403]
+                ], 403);
+            }
+        } else {
+            throw new BadRequestHttpException;
+        }
+    }
+
+    public function register()
+    {
+        if ($this->request->has('username') && $this->request->has('password') &&
+            $this->request->has('token')) {
+            $this->validate($this->request, [
+                'username' => 'bail|required|min:2|max:32|regex:/^[a-zA-ZåÅäÄöÖ\_0-9]+$/',
+                'password' => 'bail|required|min:10|max:50|regex:/^[a-zA-ZåÅäÄöÖ\_0-9!@#.]+$/',
+                'token' => 'bail|required|alpha_num|max:128'
+            ]);
+
+            $username = $this->request->input('username');
+            $password = $this->request->input('password');
+            $token = $this->request->input('token');
+
+            if (!$this->registerTokenIsValid($token)) {
+                return response()->json([
+                    'status' => '403_TOKEN_INVALID',
+                    'message' => config()['errors'][403]
+                ], 403);
+            }
+
+            if ($this->usernameIsTaken($username)) {
+                return response()->json([
+                    'status' => '403_USERNAME_TAKEN',
+                    'message' => config()['errors'][403]
+                ], 403);
+            }
+
+            $user = new User();
+
+            $user->username = $username;
+            $user->password = password_hash($password, PASSWORD_BCRYPT);
+
+            $user->timestamps = false;
+
+            $user->save();
+
+            $this->consumeRegisterToken($token);
+
+            return response()->json([
+                'status' => 201,
+                'message' => 'User created'
+            ], 201);
+        } else {
+            throw new BadRequestHttpException;
+        }
+    }
+
+    private function registerTokenIsValid($token)
+    {
+        $link = Registration_links::byToken($token)->get();
+
+        if (count($link) === 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private function usernameIsTaken($username)
+    {
+        $user = User::byUsername($username)->get();
+
+        if (count($user) === 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private function consumeRegisterToken($token)
+    {
+        $link = Registration_links::where('token', '=', $token)->first();
+        $link->timestamps = false;
+
+        $link->used = 1;
+
+        $link->save();
+    }
 }
