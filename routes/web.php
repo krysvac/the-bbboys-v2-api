@@ -42,6 +42,18 @@ $router->group(['middleware' => 'jwt.authUser'], function () use ($router) {
     $router->get('votingIsAllowed', ['uses' => 'ApiController@getVotingIsAllowed']);
 
     $router->get('selectedChoice', ['uses' => 'ApiController@getChoiceVotedFor']);
+
+    $router->get('currentWeebChoices', ['uses' => 'ApiController@getCurrentWeebChoices']);
+
+    $router->post('addWeebChoice', ['uses' => 'ApiController@addWeebChoice']);
+
+    $router->get('weebVotingAllowed', ['uses' => 'ApiController@getWeebVotingIsAllowed']);
+
+    $router->get('weebAnswersForUser', ['uses' => 'ApiController@getWeebAnswersForUser']);
+
+    $router->get('allWeebAnswers', ['uses' => 'ApiController@getAllWeebAnswers']);
+
+    $router->post('voteWeeb', ['uses' => 'ApiController@voteWeeb']);
 });
 
 $router->group(['middleware' => 'jwt.authAdmin'], function () use ($router) {

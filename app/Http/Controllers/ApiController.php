@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace App\Http\Controllers;
 
@@ -7,6 +7,8 @@ use App\Polls_choices;
 use App\Polls_answers;
 use App\Registration_links;
 use App\User;
+use App\Weeb_answers;
+use App\Weeb_choices;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -413,6 +415,171 @@ class ApiController extends Controller
             ], 201);
         } else {
             throw new BadRequestHttpException;
+        }
+    }
+
+    public function getCurrentWeebChoices()
+    {
+        return response()->json(Weeb_choices::getCurrentChoices()->get());
+    }
+
+    public function addWeebChoice()
+    {
+        date_default_timezone_set("Europe/Stockholm");
+        if ($this->request->has('value') && $this->request->has('name')) {
+            $this->validate($this->request, [
+                'value' => 'bail|required|max:50',
+                'name' => 'bail|required|max:100'
+            ]);
+
+            $value = $this->request->input('value');
+            $name = $this->request->input('name');
+
+            $maybeChoices = Weeb_choices::getByValue($value)->get();
+
+            if (count($maybeChoices) > 0) {
+                return response()->json([
+                    'status' => 204,
+                    'message' => 'Choice already added by someone else'
+                ], 204);
+            } else {
+                $user_id = $this->request->auth["id"];
+
+                $choice = new Weeb_choices();
+
+                $choice->value = $value;
+                $choice->name = $name;
+                $choice->user_id = (int)$user_id;
+                $choice->timestamp = date('Y-m-d H:i:s');
+                $choice->timestamps = false;
+
+                $choice->save();
+
+                return response()->json([
+                    'status' => 201,
+                    'message' => 'Choice added'
+                ], 201);
+
+            }
+        } else {
+            throw new BadRequestHttpException;
+        }
+    }
+
+    public function getWeebVotingIsAllowed()
+    {
+        $cutoff = Carbon::createFromTimestamp(strtotime('friday this week + 23 hours 59 minutes 59 seconds'))->toDateTimeString();
+        $now = Carbon::now();
+
+        return response()->json(['votingAllowed' => $cutoff >= $now]);
+    }
+
+    public function getWeebAnswersForUser()
+    {
+        $user_id = $this->request->auth["id"];
+
+        $answers = Weeb_answers::byUserId($user_id)->get(["weeb_answers.timestamp as timestamp", "weeb_choices.value", "weeb_choices.name"]);
+
+        if (count($answers) > 0) {
+            $newestDate = $answers[0]->timestamp;
+
+            $finalAnswers = [];
+
+            foreach ($answers as $answer) {
+                if ($answer->timestamp == $newestDate) $finalAnswers[] = $answer;
+            }
+
+            return response()->json($finalAnswers);
+        } else {
+            return response()->json([]);
+        }
+    }
+
+    public function voteWeeb()
+    {
+        date_default_timezone_set("Europe/Stockholm");
+        if ($this->request->has('choices')) {
+            $this->validate($this->request, [
+                'choices' => 'bail|required|array|min:1',
+                'choices.*' => 'bail|required|string|distinct|min:1'
+            ]);
+
+            $choices = $this->request->input('choices');
+            $continue = true;
+            foreach ($choices as $choice) {
+                $maybeChoices = Weeb_choices::getByValue($choice)->get();
+
+                if (count($maybeChoices) === 0) {
+                    $continue = false;
+                    break;
+                }
+            }
+
+            $user_id = $this->request->auth["id"];
+
+            if ($continue) {
+                $timestamp = date('Y-m-d H:i:s');
+                foreach ($choices as $value) {
+                    $choice = Weeb_choices::getByValue($value)->first();
+
+                    $answer = new Weeb_answers();
+
+                    $answer->user_id = (int)$user_id;
+                    $answer->choice_id = (int)$choice->id;
+                    $answer->ip_address = $this->request->ip();
+                    $answer->timestamp = $timestamp;
+
+                    $answer->timestamps = false;
+
+                    $answer->save();
+                }
+
+                return response()->json([
+                    'status' => 201,
+                    'message' => 'Vote(s) saved'
+                ], 201);
+            } else {
+                throw new BadRequestHttpException;
+            }
+        } else {
+            throw new BadRequestHttpException;
+        }
+    }
+
+    public function getAllWeebAnswers()
+    {
+        $answers = Weeb_answers::getAll()->get(["weeb_answers.timestamp as timestamp", "weeb_choices.value", "weeb_choices.name", "weeb_answers.user_id"]);
+
+        if (count($answers) > 0) {
+            $userIds = [];
+            $userTimestamps = new \stdClass();
+
+            foreach ($answers as $answer) {
+                if (!in_array($answer->user_id, $userIds)) $userIds[] = $answer->user_id;
+            }
+
+            foreach ($userIds as $userId) {
+                $userTimestamps->{$userId} = strtotime('monday this week - 69 days');
+                foreach ($answers as $answer) {
+                    if ($answer->user_id == $userId) {
+                        if (strtotime($answer->timestamp) > $userTimestamps->{$userId}) {
+                            $userTimestamps->{$userId} = strtotime($answer->timestamp);
+                        }
+                    }
+                }
+            }
+
+            $finalAnswers = [];
+
+            foreach ($userTimestamps as $userId => $timestamp) {
+                foreach ($answers as $answer) {
+                    if ($answer->user_id == $userId && strtotime($answer->timestamp) == $timestamp) $finalAnswers[] = $answer;
+                }
+            }
+
+            return response()->json($finalAnswers);
+        } else {
+            return response()->json([]);
         }
     }
 
