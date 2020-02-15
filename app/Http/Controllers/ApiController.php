@@ -1,4 +1,10 @@
-<?php /** @noinspection PhpComposerExtensionStubsInspection */
+<?php
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpUndefinedFieldInspection */
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnused */
+/** @noinspection PhpUndefinedMethodInspection */
+/** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace App\Http\Controllers;
 
@@ -12,21 +18,23 @@ use App\Weeb_choices;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use stdClass;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Goutte\Client;
 
 class ApiController extends Controller
 {
     /**
      * The request instance.
      *
-     * @var \Illuminate\Http\Request
+     * @var Request
      */
     private $request;
 
     /**
      * Create a new controller instance.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param Request $request
      * @return void
      */
     public function __construct(Request $request)
@@ -55,164 +63,46 @@ class ApiController extends Controller
 
     public function getBistrojItems()
     {
-        $days = array(
-            "1" => '<th class="amatic-700 whoa text-danger">M',
-            "2" => '<th class="amatic-700 whoa text-danger">Tis',
-            "3" => '<th class="amatic-700 whoa text-danger">Ons',
-            "4" => '<th class="amatic-700 whoa text-danger">Tors',
-            "5" => '<th class="amatic-700 whoa text-danger">Fre');
+        $website_url = "https://www.hors.se/karlskrona/17/3/bistro-j/";
 
-        $mealStart = array(
-            "1" => '<td width="33%">',
-            "2" => '<td width="33%">',
-            "3" => '<td width="33%">',
-            "4" => '<td width="33%">',
-            "5" => '<td width="33%">');
+        $client = new Client();
+        $crawler = $client->request('GET', $website_url);
+        $items = $crawler->filter("div.menu-item")->each(function ($node) {
+            return $node->filter("p")->each(function ($node1) {
+                return trim($node1->text());
+            });
+        });
 
-        $daysEndings = array(
-            "1" => "</th>",
-            "2" => "</th>",
-            "3" => "</th>",
-            "4" => "</th>",
-            "5" => "</th>");
+        $items_final = new stdClass();
 
-        $website_url = "http://www.hors.se/veckans-meny/?rest=183";
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $website_url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $html = curl_exec($curl);
-        curl_close($curl);
-
-        $start_point = strpos($html, '<table id="mattabellen" class="table non-responsive-menu-table">');
-        $end_point = strpos($html, '</table>', $start_point);
-        $length = $end_point - $start_point;
-        $html = substr($html, $start_point, $length);
-
-        $items = new \stdClass();
-
-        foreach ($days as $key => $value) {
-            $start = strpos($html, $value);
-            $end = strpos($html, '</tr>', $start);
-            $length = $end - $start;
-            $var = substr($html, $start, $length);
-            $var = strstr($var, $daysEndings[$key]);
-            $var = trim(substr($var, strlen($daysEndings[$key])));
-
-            $meals = array();
-            $abort = false;
-            while (!$abort) {
-                $start_point = strpos($var, '<td width="33%">');
-                $end_point = strpos($var, '</td>', $start_point);
-
-                if ($start_point === false || $end_point === false) {
-                    $abort = true;
-                    break;
-                }
-
-                $length = $end_point - $start_point;
-
-                $add = substr($var, $start_point, $length + 5);
-                $add = substr($add, strlen($mealStart[$key]));
-                $add = substr($add, 0, -5);
-
-                if (strpos($add, '<br />') !== false) {
-                    $splitmeals = explode("<br />", $add);
-
-                    foreach ($splitmeals as $split) {
-                        array_push($meals, trim($split));
-                    }
-                } else {
-                    array_push($meals, $add);
-                }
-
-                $var = trim(substr($var, $length + 5));
-            }
-
-            $items->$key = $meals;
+        foreach ($items as $key => $value) {
+            $key1 = $key + 1;
+            $items_final->$key1 = $value;
         }
 
-        return response()->json($items);
+        return response()->json($items_final);
     }
 
     public function getVillaItems()
     {
-        $days = array(
-            "1" => '<th class="amatic-700 whoa text-danger">M',
-            "2" => '<th class="amatic-700 whoa text-danger">Tis',
-            "3" => '<th class="amatic-700 whoa text-danger">Ons',
-            "4" => '<th class="amatic-700 whoa text-danger">Tors',
-            "5" => '<th class="amatic-700 whoa text-danger">Fre');
+        $website_url = "http://www.villaoscar.webbess.se/";
 
-        $mealStart = array(
-            "1" => '<td width="33%">',
-            "2" => '<td width="33%">',
-            "3" => '<td width="33%">',
-            "4" => '<td width="33%">',
-            "5" => '<td width="33%">');
+        $client = new Client();
+        $crawler = $client->request('GET', $website_url);
+        $items = $crawler->filter("div.menu-item")->each(function ($node) {
+            return $node->filter("p")->each(function ($node1) {
+                return trim($node1->text());
+            });
+        });
 
-        $daysEndings = array(
-            "1" => "</th>",
-            "2" => "</th>",
-            "3" => "</th>",
-            "4" => "</th>",
-            "5" => "</th>");
+        $items_final = new stdClass();
 
-        $website_url = "http://www.hors.se/veckans-meny/?rest=2881";
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $website_url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $html = curl_exec($curl);
-        curl_close($curl);
-
-        $start_point = strpos($html, '<table id="mattabellen" class="table non-responsive-menu-table">');
-        $end_point = strpos($html, '</table>', $start_point);
-        $length = $end_point - $start_point;
-        $html = substr($html, $start_point, $length);
-
-        $items = new \stdClass();
-
-        foreach ($days as $key => $value) {
-            $start = strpos($html, $value);
-            $end = strpos($html, '</tr>', $start);
-            $length = $end - $start;
-            $var = substr($html, $start, $length);
-            $var = strstr($var, $daysEndings[$key]);
-            $var = trim(substr($var, strlen($daysEndings[$key])));
-
-            $meals = array();
-            $abort = false;
-            while (!$abort) {
-                $start_point = strpos($var, '<td width="33%">');
-                $end_point = strpos($var, '</td>', $start_point);
-
-                if ($start_point === false || $end_point === false) {
-                    $abort = true;
-                    break;
-                }
-
-                $length = $end_point - $start_point;
-
-                $add = substr($var, $start_point, $length + 5);
-                $add = substr($add, strlen($mealStart[$key]));
-                $add = substr($add, 0, -5);
-
-                if (strpos($add, '<br />') !== false) {
-                    $splitmeals = explode("<br />", $add);
-
-                    foreach ($splitmeals as $split) {
-                        array_push($meals, trim($split));
-                    }
-                } else {
-                    array_push($meals, $add);
-                }
-
-                $var = trim(substr($var, $length + 5));
-            }
-
-            $items->$key = $meals;
+        foreach ($items as $key => $value) {
+            $key1 = $key + 1;
+            $items_final->$key1 = $value;
         }
 
-        return response()->json($items);
+        return response()->json($items_final);
     }
 
     public function getUserCanVoteToday()
@@ -309,6 +199,8 @@ class ApiController extends Controller
         if (function_exists('openssl_random_pseudo_bytes')) {
             return bin2hex(openssl_random_pseudo_bytes($length));
         }
+
+        return null;
     }
 
     public function changePassword()
@@ -552,7 +444,7 @@ class ApiController extends Controller
 
         if (count($answers) > 0) {
             $userIds = [];
-            $userTimestamps = new \stdClass();
+            $userTimestamps = new stdClass();
 
             foreach ($answers as $answer) {
                 if (!in_array($answer->user_id, $userIds)) $userIds[] = $answer->user_id;
